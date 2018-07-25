@@ -1,5 +1,6 @@
 package com.mygdx.game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -31,14 +32,16 @@ public class MyGdxGame extends ApplicationAdapter {
 	private OrthographicCamera camera;
     private Rectangle rTouch;
     private ScalingViewport viewport;
-
+    private int score;
+    private String yourScoreName;
+    BitmapFont yourBitmapFontName;
 	
 	@Override
 	public void create () {
 
-
-
-
+        score = 0;
+        yourScoreName = "score: 0";
+        yourBitmapFontName = new BitmapFont();
 
         batch = new SpriteBatch();
 		tBalloons = new Texture("Balloons.png");
@@ -73,6 +76,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
         batch.begin();
         batch.draw(tBackImage, 0,0,iwidthScreen,iheightScreen);
+        yourBitmapFontName.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        yourBitmapFontName.draw(batch, yourScoreName, 25, 100); 
         for (Rectangle rBalloon : aBalloons) {
             batch.draw(tBalloons, rBalloon.x, rBalloon.y);
          }
@@ -86,20 +91,28 @@ public class MyGdxGame extends ApplicationAdapter {
         for (Iterator<Rectangle> iter = aBalloons.iterator(); iter.hasNext(); ) {
             Rectangle rBalloon = iter.next();
 
-            rBalloon.y += 50 * Gdx.graphics.getDeltaTime();
+            rBalloon.y += 100 * Gdx.graphics.getDeltaTime();
 
             rBalloon.x -= 10 * Gdx.graphics.getDeltaTime();
 
 
 
-            if (Gdx.input.justTouched()) {
-                Vector3 touchPos = new Vector3();
-                touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-                camera.unproject(touchPos);
-                if (rBalloon.contains(touchPos.x-20, touchPos.y-10)) {
-                    iter.remove();
-                }
+            for (int i = 0; i < 10; i++) {
+                if (Gdx.input.isTouched(i)) {
+                    if (Gdx.input.justTouched()) {
+                        Vector3 touchPos = new Vector3();
 
+                        touchPos.set(Gdx.input.getX(i), Gdx.input.getY(i), 0);
+                        camera.unproject(touchPos);
+                        if (rBalloon.contains(touchPos.x - 20, touchPos.y - 10)) {
+                            Gdx.input.vibrate(100);
+                            score++;
+                            yourScoreName = "score: " + score;
+                            iter.remove();
+                        }
+
+                    }
+                }
             }
 
             if (rBalloon.y > iheightScreen) {
