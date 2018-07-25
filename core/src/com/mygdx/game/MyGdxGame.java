@@ -1,5 +1,7 @@
 package com.mygdx.game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.ApplicationAdapter;
@@ -8,34 +10,49 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
 
 import java.util.Iterator;
 
 public class MyGdxGame extends ApplicationAdapter {
-	private int iwidthScreen = 800;
-	private int iheightScreen = 480;
-	private Texture tBackImage;
+
+    private int iwidthScreen = 480;
+    private int iheightScreen = 800;
+    private Texture tBackImage;
 	private Array<Rectangle> aBalloons;
 	private long lLastBalloonTime;
 	private Texture tBalloons;
 	SpriteBatch batch;
 	private OrthographicCamera camera;
     private Rectangle rTouch;
+    private ScalingViewport viewport;
 
 	
 	@Override
 	public void create () {
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, iwidthScreen, iheightScreen);
-		batch = new SpriteBatch();
-		tBalloons = new Texture("Balloons.jpg");
+
+
+
+
+
+        batch = new SpriteBatch();
+		tBalloons = new Texture("Balloons.png");
 		tBackImage = new Texture("BackGroundPlay.jpg");
 		aBalloons = new Array<Rectangle>();
         rTouch = new Rectangle();
         spawnBalloons();
-	}
+
+        camera = new OrthographicCamera();
+        viewport = new FillViewport(iwidthScreen,iheightScreen,camera);
+        viewport.apply();
+
+
+    }
 
 	private void spawnBalloons() {
 		Rectangle rBalloon = new Rectangle();
@@ -54,16 +71,14 @@ public class MyGdxGame extends ApplicationAdapter {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
-
         batch.begin();
-        batch.draw(tBackImage, 0, 0);
+        batch.draw(tBackImage, 0,0,iwidthScreen,iheightScreen);
         for (Rectangle rBalloon : aBalloons) {
-
             batch.draw(tBalloons, rBalloon.x, rBalloon.y);
-        }
+         }
+
+
         batch.end();
-
-
 
 
         if (TimeUtils.nanoTime() - lLastBalloonTime > 1000000000) spawnBalloons();
@@ -71,22 +86,25 @@ public class MyGdxGame extends ApplicationAdapter {
         for (Iterator<Rectangle> iter = aBalloons.iterator(); iter.hasNext(); ) {
             Rectangle rBalloon = iter.next();
 
-            rBalloon.y += 200 * Gdx.graphics.getDeltaTime();
+            rBalloon.y += 50 * Gdx.graphics.getDeltaTime();
+
+            rBalloon.x -= 10 * Gdx.graphics.getDeltaTime();
+
+
 
             if (Gdx.input.justTouched()) {
                 Vector3 touchPos = new Vector3();
                 touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
                 camera.unproject(touchPos);
-                if(rBalloon.contains(touchPos.x,touchPos.y)) {
+                if (rBalloon.contains(touchPos.x-20, touchPos.y-10)) {
                     iter.remove();
                 }
+
             }
 
-
-            if (rBalloon.y > 480) {
+            if (rBalloon.y > iheightScreen) {
                 iter.remove();
             }
-
         }
     }
 	
@@ -95,4 +113,10 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch.dispose();
 		tBackImage.dispose();
 	}
+
+    @Override
+    public void resize(int width, int height){
+        viewport.update(width,height);
+       camera.position.set(camera.viewportWidth/2,camera.viewportHeight/2,0);
+    }
 }
