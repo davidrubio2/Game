@@ -175,9 +175,21 @@ public class MyGdxGame extends ApplicationAdapter {
         for (Iterator<Rectangle> iter = aBalloons.iterator(); iter.hasNext(); ) {
             Rectangle rBalloon = iter.next();
 
-            rBalloon.y += 100 * Gdx.graphics.getDeltaTime();
+            if (score >= 600)
+            {
+                dispose();
+                create();
+                resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+                eGameState = GameState.MENU;
+            }
+            int nivel  = niveles(score);
 
-            rBalloon.x -= 10 * Gdx.graphics.getDeltaTime();
+            rBalloon.y += nivel * Gdx.graphics.getDeltaTime();
+
+            rBalloon.x -= (10+score) * Gdx.graphics.getDeltaTime();
+
+
+
 
             for (int i = 0; i < 10; i++) {
                 if (Gdx.input.isTouched(i)) {
@@ -199,8 +211,31 @@ public class MyGdxGame extends ApplicationAdapter {
 
             if (rBalloon.y > iheightScreen) {
                 iter.remove();
+                dispose();
+                create();
+                resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+                eGameState = GameState.MENU;
             }
         }
+
+    }
+    public int niveles(int nivel) {
+
+        if (nivel > 500) {
+            return 350;
+        } else if (nivel > 400) {
+            return 300;
+        } else if (nivel > 300) {
+            return 250;
+
+        } else if (nivel > 200) {
+            return 200;
+
+        } else if (nivel > 100) {
+            return 150;
+
+        }
+        return 100;
 
     }
 
