@@ -186,7 +186,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
             rBalloon.y += nivel * Gdx.graphics.getDeltaTime();
 
-            rBalloon.x -= (10+score) * Gdx.graphics.getDeltaTime();
+            rBalloon.x -= (10) * Gdx.graphics.getDeltaTime();
 
 
 
