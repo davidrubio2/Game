@@ -39,6 +39,7 @@ public class MyGdxGame extends ApplicationAdapter {
     private ScalingViewport viewport;
     private int score;
     private String yourScoreName;
+    private String ScoreMenu = "SCORE: 0";
     private  BitmapFont yourBitmapFontName;
 
     private Stage stage;
@@ -47,7 +48,7 @@ public class MyGdxGame extends ApplicationAdapter {
     private BitmapFont font;
     TextButton button1;
     TextButton button2;
-
+    TextButton button3;
 	@Override
 	public void create () {
         Gdx.input.setCatchBackKey(true);
@@ -82,12 +83,16 @@ public class MyGdxGame extends ApplicationAdapter {
         button1  = new TextButton("Play", textButtonStyle);
         button2 = new TextButton("Settings", textButtonStyle);
 
+        button3 = new TextButton(ScoreMenu, textButtonStyle);
+
         table.add(button1).space(50);
         table.row();
 
         table.add(button2).space(50);
         table.row();
 
+        table.add(button3).space(50);
+        table.row();
 
     }
 
@@ -111,7 +116,7 @@ public class MyGdxGame extends ApplicationAdapter {
     @Override
     public void resume()
     {
-        eGameState = GameState.PLAY;
+        eGameState = GameState.MENU;
     }
 
 	@Override
@@ -122,8 +127,9 @@ public class MyGdxGame extends ApplicationAdapter {
                 camera.update();
                 batch.setProjectionMatrix(camera.combined);
                 stage.act(Gdx.graphics.getDeltaTime());
-                stage.draw();
+                button3.setText(ScoreMenu);
                 batch.begin();
+                stage.draw();
                 batch.end();
                 button1.addListener(new ChangeListener() {
                     @Override
@@ -170,7 +176,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	public void logica()
     {
-        if (TimeUtils.nanoTime() - lLastBalloonTime > 1000000000) spawnBalloons();
+        //1000000000
+        if (TimeUtils.nanoTime() - lLastBalloonTime > 299999999) spawnBalloons();
 
         for (Iterator<Rectangle> iter = aBalloons.iterator(); iter.hasNext(); ) {
             Rectangle rBalloon = iter.next();
@@ -183,11 +190,6 @@ public class MyGdxGame extends ApplicationAdapter {
                 eGameState = GameState.MENU;
             }
             int nivel  = niveles(score);
-
-            rBalloon.y += nivel * Gdx.graphics.getDeltaTime();
-
-            rBalloon.x -= (10) * Gdx.graphics.getDeltaTime();
-
 
 
 
@@ -210,12 +212,17 @@ public class MyGdxGame extends ApplicationAdapter {
             }
 
             if (rBalloon.y > iheightScreen) {
+                ScoreMenu = yourScoreName;
                 iter.remove();
                 dispose();
                 create();
                 resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
                 eGameState = GameState.MENU;
             }
+
+            rBalloon.y += nivel * Gdx.graphics.getDeltaTime();
+            rBalloon.x -= (10) * Gdx.graphics.getDeltaTime();
+
         }
 
     }
